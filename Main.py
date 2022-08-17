@@ -1,76 +1,58 @@
-class Solution:
-   
-    def __init__(self, size):
-        self.stack = []
-        self.queue = []
-        self.size = size
-        self.top = -1
-        self.rear = -1
-        self.front = -1
+import operator
+class Evaluate:
 
-    def is_stack_empty(self):
-        if self.top == -1:
+  def __init__(self, size):
+    self.top = -1
+    self.size_of_stack = size
+    self.stack = []
+
+  def isEmpty(self):
+        if len(self.stack)==0:
+        return True
+    else:
+        return False
+
+  def _pop(self):
+    if self.isEmpty():
+      print("Your stack is empty")
+    else:
+        return self.stack.pop()
+
+  def push(self, operand):
+    self.operand = operand
+    if len(self.stack)==self.size_of_stack:
+      print("Your stack is full")
+    else:
+        self.stack.append(self.operand)
+        self.top+=1
+       
+
+  def validate_postfix_expression(self, expression):
+    for x in expression:
+        if x.isnumeric()==True:
             return True
         else:
-            return False
+            if x=="+" or x=="-" or x=="" or x=="/" or x=="*":
+                return True
+            else:
+                return False
 
-    def is_queue_empty(self):
-        if self.rear == -1 and self.front == -1:
-            return True
+  def evaluate_postfix_expression(self, expression):
+    for i in expression:
+        if i.isnumeric():
+            self.push(int(i))
         else:
-            return False
+           a=self._pop()
+           b=self._pop()
+           operations_dictionary={"+":operator.add,"-":operator.sub,"*":operator.mul,"/":operator.floordiv,"^":operator.pow}
+           self.push(operations_dictionary[i](b,a))
+     
+    return self.stack[0]
 
-    def is_stack_full(self):
-        if self.size == len(self.stack):
-            return True
-        else:
-            return False
-
-    def is_queue_full(self):
-        if self.size == len(self.queue):
-            return True
-        else:
-            return False
-
-    def push_character(self, character):
-        if not self.is_stack_full():
-            self.stack.append(character)
-            self.top += 1
-
-    def enqueue_character(self, character):
-        if not self.is_queue_full():
-            self.queue.append(character)
-            self.rear += 1
-            if self.front == -1:
-                self.front += 1
-
-    def pop_character(self):
-        if not self.is_stack_empty():
-            data = self.stack.pop()
-            self.top -= 1
-            return data
-
-    def dequeue_character(self):      
-        if not self.is_queue_empty():
-            data = self.queue[self.front]
-            self.front += 1
-            return data
-
-text = input()
-length_of_text = len(text)
-solution = Solution(length_of_text)
-
-for index in range(length_of_text):
-    solution.push_character(text[index])
-    solution.enqueue_character(text[index])
-
-is_palindrome = True
-for index in range(length_of_text):
-    if  solution.pop_character() != solution.dequeue_character():
-        is_palindrome = False
-        break
-
-if is_palindrome:
-    print("The word, " + text + ", is a palindrome.");
+postfix_expression = input()  
+tokens = postfix_expression.split()
+evaluate = Evaluate(len(tokens))
+if evaluate.validate_postfix_expression(tokens):
+    print(evaluate.evaluate_postfix_expression(tokens))
 else:
-    print("The word, " + text + ", is not a palindrome.")
+    print('Invalid postfix expression')
